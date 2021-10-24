@@ -1,6 +1,6 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
+/** @var Router $router */
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +13,23 @@
 |
 */
 
+use Laravel\Lumen\Routing\Router;
+
 $router->get('/', function () use ($router) {
     return $router->app->version();
+});
+
+$router->group(['prefix' => 'auth'], function ($router) {
+    $router->post('login', 'UserController@login');
+});
+$router->group(['prefix' => 'user', 'middleware' => 'auth'], function ($router) {
+    $router->get('profile', 'UserController@profile');
+});
+
+$router->group(['prefix' => 'admin'], function ($router) {
+    $router->post('login', 'AdminController@login');
+
+    $router->group(['prefix' => 'users', 'middleware' => 'auth'], function ($router) {
+        $router->get('', 'UserController@all');
+    });
 });
